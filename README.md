@@ -19,6 +19,17 @@ This is a Python script for keeping our CRL archive up-to-date
   `pipenv`'s documentation for instructions on installing `pipenv](
   https://pipenv.readthedocs.io/en/latest/install/#installing-pipenv).
 
+### Cloning
+This project contains git submodules. Here is an example clone command that will
+automatically initialize and update those modules:
+
+    git clone --recurse-submodules git@github.com:dod-ccpo/atst.git
+
+If you have an existing clone that does not yet contain the submodules, you can
+set them up with the following command:
+
+    git submodule update --init --recursive
+
 ### Setup
 This application uses Pipenv to manage Python dependencies and a virtual
 environment. Instead of the classic `requirements.txt` file, pipenv uses a
