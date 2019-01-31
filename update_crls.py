@@ -19,8 +19,6 @@ _STORAGE_BASE_URL = os.getenv("RACKSPACE_STORAGE_URL")
 _STORAGE_CONTAINER_NAME = "crls"
 _STORAGE_CRL_ARCHIVE_NAME = "dod_crls.tar.bz"
 
-#https://storage101.iad3.clouddrive.com/v1/MossoCloudFS_1095493/crls
-#curl https://identity.api.rackspacecloud.com/v2.0/tokens -X POST -d '{"auth":{"RAX-KSKEY:apiKeyCredentials":{"username":"dan-pw","apiKey":"c1deedb930c840f681a86a5802ee4eef"}}}' -H "Content-type: application/json"
 
 def rackspace_auth_request():
     payload = {'auth':{'RAX-KSKEY:apiKeyCredentials':{'username':_RACKSPACE_AUTH_USER,'apiKey':_RACKSPACE_AUTH_SECRET}}}
