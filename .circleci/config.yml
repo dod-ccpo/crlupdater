@@ -26,6 +26,8 @@ jobs:
         environment: *dockerCmdEnvironment
     working_directory: *workingDirectory
     steps:
+      - attach_workspace:
+          at: .
       - checkout
       - run:
           name: "Clone Submodules"
@@ -78,6 +80,10 @@ jobs:
             docker push ${IMAGE_NAME} | cat
             curl -s -H "Content-Type: application/json" --user ${REGISTRY_USERNAME}:${REGISTRY_PASSWORD} -XGET https://${ATAT_DOCKER_REGISTRY_URL}/v2/${PROD_IMAGE_NAME}/manifests/${GIT_SHA} || true
             docker logout
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
 
   deploy:
     docker:
@@ -96,7 +102,7 @@ jobs:
           command: echo "export IMAGE_NAME=\"${ATAT_DOCKER_REGISTRY_URL}/${PROD_IMAGE_NAME}:${GIT_SHA}\"" >> $BASH_ENV
       - run:
           name: "Update Kubernetes Deployment"
-          command: ./deploy/kubernetes/atst-update-deploy.sh
+          command: ./deploy/kubernetes/crlupdater-update-deploy.sh
 
 workflows:
   version: 2
