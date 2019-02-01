@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from html.parser import HTMLParser
 import json
 from OpenSSL import crypto, SSL
