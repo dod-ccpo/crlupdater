@@ -55,6 +55,9 @@ jobs:
           name: "Copy Workspace Contents into the Container"
           command: docker cp . ${CONTAINER_NAME}:${APP_DIR}
       - run:
+          name: "Install pipenv"
+          command: docker exec -t --workdir ${APP_DIR} ${CONTAINER_NAME} 'pip install pipenv'
+      - run:
           name: "Run Alpine Setup"
           command: docker exec -t --workdir ${APP_DIR} ${CONTAINER_NAME} ./script/alpine_setup
       - run:
