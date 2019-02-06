@@ -10,7 +10,7 @@ APP_USER="crlupdater"
 APP_UID="8015"
 
 # Add additional packages required by app dependencies
-ADDITIONAL_PACKAGES="python3"
+ADDITIONAL_PACKAGES="bzip2 python3 tar"
 
 # Run the shared alpine setup script
 source ./script/include/run_alpine_setup
