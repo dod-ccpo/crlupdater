@@ -1,5 +1,6 @@
 # crlupdater
 
+[![Build Status](https://circleci.com/gh/dod-ccpo/crlupdater.svg?style=svg)](https://circleci.com/gh/dod-ccpo/crlupdater)
 
 ## Description
 
