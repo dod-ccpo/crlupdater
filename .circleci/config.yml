@@ -28,6 +28,10 @@ jobs:
     steps:
       - attach_workspace:
           at: .
+      - run:
+          name: "Setup clean Alpine image for CircleCI usage"
+          command: |
+            apk update && apk upgrade && apk add --no-cache bash git openssh tar gzip
       - checkout
       - run:
           name: "Clone Submodules"
