@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: crlupdater
-          image: registry.atat.codes:443/crlupdater-prod:latest
+          image: registry.atat.codes:443/crlupdater-prod:5c186cf
           resources:
             requests:
                memory: "1000Mi"
