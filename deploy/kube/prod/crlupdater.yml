@@ -1,0 +1,28 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: atat
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: crlupdater
+  name: crlupdater
+  namespace: atat
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: crlupdater
+    spec:
+      containers:
+        - name: crlupdater
+          image: registry.atat.codes:443/crlupdater-prod:latest
+          resources:
+            requests:
+               memory: "1000Mi"
