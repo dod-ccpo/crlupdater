@@ -3,9 +3,6 @@ version: 2.0
 defaults:
   working_directory: &workingDirectory /opt/atat/crlupdater
   sourceImage: &sourceImage alpine:3.8
-  sourceAuth: &sourceAuth
-    username: $REGISTRY_USERNAME
-    password: $REGISTRY_PASSWORD
   appEnvironment: &appEnvironment
     KEEP_EXISTING_VENV: true
     PIP_VERSION: 18.*
@@ -22,7 +19,6 @@ jobs:
   build_and_push_image:
     docker:
       - image: *sourceImage
-        auth: *sourceAuth
         environment: *dockerCmdEnvironment
     working_directory: *workingDirectory
     steps:
@@ -99,7 +95,6 @@ jobs:
   deploy:
     docker:
       - image: *sourceImage
-        auth: *sourceAuth
         environment: *dockerCmdEnvironment
     working_directory: *workingDirectory
     steps:
