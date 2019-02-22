@@ -89,7 +89,7 @@ jobs:
               ${CONTAINER_NAME} \
               ${IMAGE_NAME}
       - run:
-          name: "Publish crlupodater Image"
+          name: "Publish crlupdater Image"
           shell: "/bin/bash -eo pipefail"
           command: |
             docker image ls
