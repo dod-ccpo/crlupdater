@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# script/fix_permissions: Updates the app directory with the correct user 
+#                         permissions (skipping node_modules since it is not
+#                         required and very large)
+
+source "$(dirname "${0}")"/../script/include/global_header.inc.sh
+
+APP_USER="${1}"
+APP_GROUP="${2}"
+
+if [ "${APP_USER}x" = "x" ] || [ "${APP_GROUP}x" = "x" ]; then
+    echo "ERROR: Missing username or groupname argument!"
+    echo "Received: *${APP_USER}:${APP_GROUP}*"
+    echo
+    exit 1
+fi
+
+chown "${APP_USER}:${APP_GROUP}" .
+chown "${APP_USER}:${APP_GROUP}" ./*
+for subdir in $(find . -type d -maxdepth 1 | grep -Ee '.[^/]' | grep -Fve 'node_modules')
+do
+    chown "${APP_USER}:${APP_GROUP}" -R "${subdir}"
+done

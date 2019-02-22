@@ -4,15 +4,12 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+cffi = "*"
 lockfile = "*"
 pendulum = "*"
 pyopenssl = "*"
 requests = "*"
 simplejson = "*"
-
-[dev-packages]
-ipython = "*"
-pylint = "*"
 
 [requires]
 python_version = "3.6.6"

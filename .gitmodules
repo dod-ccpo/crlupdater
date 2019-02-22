@@ -1,0 +1,3 @@
+[submodule "script/include"]
+	path = script/include
+	url = git@github.com:dod-ccpo/scriptz.git

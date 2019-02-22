@@ -1,0 +1,136 @@
+version: 2.0
+
+defaults:
+  working_directory: &workingDirectory /opt/atat/crlupdater
+  sourceImage: &sourceImage alpine:3.8
+  appEnvironment: &appEnvironment
+    KEEP_EXISTING_VENV: true
+  dockerCmdEnvironment: &dockerCmdEnvironment
+    APP_USER: crlupdater
+    APP_GROUP: atat
+    APP_DIR: /opt/atat/crlupdater
+    ATAT_DOCKER_REGISTRY_URL: registry.atat.codes:443
+    CONTAINER_NAME: crlupdater-container
+    USR_BIN_DIR: /usr/bin
+    PROD_IMAGE_NAME: crlupdater-prod
+
+jobs:
+  build_and_push_image:
+    docker:
+      - image: *sourceImage
+        environment: *dockerCmdEnvironment
+    working_directory: *workingDirectory
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: "Setup clean Alpine image for CircleCI usage"
+          command: |
+            apk update && apk upgrade && apk add --no-cache bash curl docker git gzip openssh tar
+      - checkout
+      - run:
+          name: "Clone Submodules"
+          command: |
+            git submodule update --init --recursive
+      - setup_remote_docker:
+          version: 18.05.0-ce
+      - run:
+          name: "Export GIT_SHA"
+          shell: "/bin/bash -eo pipefail"
+          command: echo "export GIT_SHA=$(git rev-parse --short HEAD)" >> $BASH_ENV
+      - run:
+          name: "Generate the Target Image Name"
+          shell: "/bin/bash -eo pipefail"
+          command: echo "export IMAGE_NAME=\"${ATAT_DOCKER_REGISTRY_URL}/${PROD_IMAGE_NAME}:${GIT_SHA}\"" >> $BASH_ENV
+      - run:
+          name: "Start a Fresh Container"
+          shell: "/bin/bash -eo pipefail"
+          command: docker run -d --entrypoint='/bin/sh' -ti --name ${CONTAINER_NAME} alpine:3.8
+      - run:
+          name: "Create the App Directory"
+          shell: "/bin/bash -eo pipefail"
+          command: docker exec -t ${CONTAINER_NAME} mkdir -p ${APP_DIR}
+      - run:
+          name: "Copy Workspace Contents into the Container"
+          shell: "/bin/bash -eo pipefail"
+          command: docker cp . ${CONTAINER_NAME}:${APP_DIR}
+      - run:
+          name: "Run Alpine Setup"
+          shell: "/bin/bash -eo pipefail"
+          command: docker exec -t --workdir ${APP_DIR} ${CONTAINER_NAME} ./script/alpine_setup
+      - run:
+          name: "Install pipenv"
+          shell: "/bin/bash -eo pipefail"
+          command: docker exec -t --workdir ${APP_DIR} ${CONTAINER_NAME} /usr/bin/pip3 install pipenv
+      - run:
+          name: "Run app setup"
+          shell: "/bin/bash -eo pipefail"
+          command: docker exec -t --workdir ${APP_DIR} ${CONTAINER_NAME} ./script/setup
+      - run:
+          name: "Run Fix Permissions"
+          shell: "/bin/bash -eo pipefail"
+          command: docker exec -t --workdir ${APP_DIR} ${CONTAINER_NAME} ./script/fix_permissions ${APP_USER} ${APP_GROUP}
+      - run:
+          name: "Commit Container Changes to New Image"
+          shell: "/bin/bash -eo pipefail"
+          command: |
+            docker commit \
+              --change="ENV APP_USER \"${APP_USER}\"" \
+              --change="ENV APP_GROUP \"${APP_GROUP}\"" \
+              --change="ENV APP_DIR \"${APP_DIR}\"" \
+              --change="ENV RACKSPACE_AUTH_URL \"${RACKSPACE_AUTH_URL}\"" \
+              --change="ENV RACKSPACE_USERNAME \"${RACKSPACE_USERNAME}\"" \
+              --change="ENV RACKSPACE_PASSWORD \"${RACKSPACE_PASSWORD}\"" \
+              --change="ENV RACKSPACE_STORAGE_URL \"${RACKSPACE_STORAGE_URL}\"" \
+              --change='ENTRYPOINT ["/usr/bin/dumb-init", "--"]' \
+              --change="CMD [\"bash\", \"-c\", \"${APP_DIR}/script/server\"]" \
+              --change="WORKDIR ${APP_DIR}" \
+              --change="USER \"${APP_USER}\"" \
+              ${CONTAINER_NAME} \
+              ${IMAGE_NAME}
+      - run:
+          name: "Publish crlupodater Image"
+          shell: "/bin/bash -eo pipefail"
+          command: |
+            docker image ls
+            docker login -u ${REGISTRY_USERNAME} -p ${REGISTRY_PASSWORD} ${ATAT_DOCKER_REGISTRY_URL}
+            docker push ${IMAGE_NAME} | cat
+            curl -s -H "Content-Type: application/json" --user ${REGISTRY_USERNAME}:${REGISTRY_PASSWORD} -XGET https://${ATAT_DOCKER_REGISTRY_URL}/v2/${PROD_IMAGE_NAME}/manifests/${GIT_SHA} || true
+            docker logout
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+
+  deploy:
+    docker:
+      - image: *sourceImage
+        environment: *dockerCmdEnvironment
+    working_directory: *workingDirectory
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: "Export GIT_SHA"
+          shell: "/bin/bash -eo pipefail"
+          command: echo "export GIT_SHA=$(git rev-parse --short HEAD)" >> $BASH_ENV
+      - run:
+          name: "Generate the Target Image Name"
+          shell: "/bin/bash -eo pipefail"
+          command: echo "export IMAGE_NAME=\"${ATAT_DOCKER_REGISTRY_URL}/${PROD_IMAGE_NAME}:${GIT_SHA}\"" >> $BASH_ENV
+      - run:
+          name: "Update Kubernetes Deployment"
+          shell: "/bin/bash -eo pipefail"
+          command: ./deploy/kubernetes/crlupdater-update-deploy.sh
+
+workflows:
+  version: 2
+  crlupdater:
+    jobs:
+      - build_and_push_image
+#      - deploy:
+#          requires:
+#            - build_and_push_image
+#          filters:
+#            branches:
+#              only: master
