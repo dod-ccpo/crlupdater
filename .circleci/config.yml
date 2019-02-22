@@ -21,8 +21,6 @@ jobs:
         environment: *dockerCmdEnvironment
     working_directory: *workingDirectory
     steps:
-      - attach_workspace:
-          at: .
       - run:
           name: "Setup clean Alpine image for CircleCI usage"
           command: |
@@ -97,10 +95,6 @@ jobs:
             docker push ${IMAGE_NAME} | cat
             curl -s -H "Content-Type: application/json" --user ${REGISTRY_USERNAME}:${REGISTRY_PASSWORD} -XGET https://${ATAT_DOCKER_REGISTRY_URL}/v2/${PROD_IMAGE_NAME}/manifests/${GIT_SHA} || true
             docker logout
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
 
   deploy:
     docker:
@@ -108,8 +102,15 @@ jobs:
         environment: *dockerCmdEnvironment
     working_directory: *workingDirectory
     steps:
-      - attach_workspace:
-          at: .
+      - run:
+          name: "Setup clean Alpine image for CircleCI usage"
+          command: |
+            apk update && apk upgrade && apk add --no-cache bash curl docker git gzip openssh tar
+      - checkout
+      - run:
+          name: "Clone Submodules"
+          command: |
+            git submodule update --init --recursive
       - run:
           name: "Export GIT_SHA"
           shell: "/bin/bash -eo pipefail"
