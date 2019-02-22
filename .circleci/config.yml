@@ -64,6 +64,8 @@ jobs:
       - run:
           name: "Variable Checks"
           command: |
+            echo "Shell: ${0}"
+            echo "BASH_ENV: ${BASH_ENV}"
             echo "Git SHA: ${GIT_SHA}"
             echo "Running container name: ${CONTAINER_NAME}"
             echo "Image name: ${IMAGE_NAME}"
