@@ -49,6 +49,12 @@ kubectl config set-credentials atat-deployer --token="$(echo ${K8S_USER_TOKEN} |
 kubectl config use-context deployer
 kubectl config current-context
 
+echo .
+echo "Deploying to cluster at: ${K8S_ENDPOINT}"
+echo "With CA CRT: "
+cat ${HOME}/k8s_ca.crt
+echo .
+
 # Update the crlupdater deployment
 kubectl -n ${NAMESPACE} set image deployment.apps/crlupdater crlupdater="${IMAGE_NAME}"
 
