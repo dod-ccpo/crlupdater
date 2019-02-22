@@ -89,7 +89,7 @@ jobs:
               ${CONTAINER_NAME} \
               ${IMAGE_NAME}
       - run:
-          name: "Publish crlupodater Image"
+          name: "Publish crlupdater Image"
           shell: "/bin/bash -eo pipefail"
           command: |
             docker image ls
@@ -121,16 +121,16 @@ jobs:
       - run:
           name: "Update Kubernetes Deployment"
           shell: "/bin/bash -eo pipefail"
-          command: ./deploy/kubernetes/crlupdater-update-deploy.sh
+          command: ./deploy/kubernetes/prod/update-deploy.sh
 
 workflows:
   version: 2
   crlupdater:
     jobs:
       - build_and_push_image
-#      - deploy:
-#          requires:
-#            - build_and_push_image
-#          filters:
-#            branches:
-#              only: master
+      - deploy:
+          requires:
+            - build_and_push_image
+          filters:
+            branches:
+              only: master
