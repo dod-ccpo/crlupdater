@@ -61,13 +61,6 @@ jobs:
           shell: "/bin/bash -eo pipefail"
           command: docker exec -t --workdir ${APP_DIR} ${CONTAINER_NAME} /usr/bin/pip3 install pipenv
       - run:
-          name: "Install kubectl"
-          shell: "/bin/bash -eo pipefail"
-          command: |
-            cd /usr/bin
-            curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
-            chmod +x ./kubectl
-      - run:
           name: "Run app setup"
           shell: "/bin/bash -eo pipefail"
           command: docker exec -t --workdir ${APP_DIR} ${CONTAINER_NAME} ./script/setup
@@ -126,6 +119,13 @@ jobs:
           name: "Generate the Target Image Name"
           shell: "/bin/bash -eo pipefail"
           command: echo "export IMAGE_NAME=\"${ATAT_DOCKER_REGISTRY_URL}/${PROD_IMAGE_NAME}:${GIT_SHA}\"" >> $BASH_ENV
+      - run:
+          name: "Install kubectl"
+          shell: "/bin/bash -eo pipefail"
+          command: |
+            cd /usr/bin
+            curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+            chmod +x ./kubectl
       - run:
           name: "Update Kubernetes Deployment"
           shell: "/bin/bash -eo pipefail"
