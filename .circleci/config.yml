@@ -71,16 +71,6 @@ jobs:
           shell: "/bin/bash -eo pipefail"
           command: docker exec -t --workdir ${APP_DIR} ${CONTAINER_NAME} ./script/fix_permissions ${APP_USER} ${APP_GROUP}
       - run:
-          name: "Variable Checks"
-          shell: "/bin/bash -eo pipefail"
-          command: |
-            echo "Shell: ${0}"
-            echo "BASH_ENV: ${BASH_ENV}"
-            echo "Git SHA: ${GIT_SHA}"
-            echo "Running container name: ${CONTAINER_NAME}"
-            echo "Image name: ${IMAGE_NAME}"
-            docker container list
-      - run:
           name: "Commit Container Changes to New Image"
           shell: "/bin/bash -eo pipefail"
           command: |
