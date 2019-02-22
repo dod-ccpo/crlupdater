@@ -26,7 +26,7 @@ jobs:
       - run:
           name: "Setup clean Alpine image for CircleCI usage"
           command: |
-            apk update && apk upgrade && apk add --no-cache bash docker git gzip openssh tar
+            apk update && apk upgrade && apk add --no-cache bash curl docker git gzip openssh tar
       - checkout
       - run:
           name: "Clone Submodules"
