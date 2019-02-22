@@ -61,6 +61,13 @@ jobs:
           shell: "/bin/bash -eo pipefail"
           command: docker exec -t --workdir ${APP_DIR} ${CONTAINER_NAME} /usr/bin/pip3 install pipenv
       - run:
+          name: "Install kubectl"
+          shell: "/bin/bash -eo pipefail"
+          command: |
+            cd /usr/bin
+            curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+            chmod +x ./kubectl
+      - run:
           name: "Run app setup"
           shell: "/bin/bash -eo pipefail"
           command: docker exec -t --workdir ${APP_DIR} ${CONTAINER_NAME} ./script/setup
