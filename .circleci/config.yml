@@ -56,7 +56,7 @@ jobs:
           command: docker cp . ${CONTAINER_NAME}:${APP_DIR}
       - run:
           name: "Run Alpine Setup"
-          command: docker exec -t --workdir ${APP_DIR} ${CONTAINER_NAME} ./script/alpine_setup
+          command: docker exec -t --workdir ${APP_DIR} ${CONTAINER_NAME} ./script/alpine_setup | cat
       - run:
           name: "Install pipenv"
           command: docker exec -t --workdir ${APP_DIR} ${CONTAINER_NAME} '/usr/bin/pip3 install pipenv'
