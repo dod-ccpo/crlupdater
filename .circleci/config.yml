@@ -5,7 +5,6 @@ defaults:
   sourceImage: &sourceImage alpine:3.8
   appEnvironment: &appEnvironment
     KEEP_EXISTING_VENV: true
-    PIP_VERSION: 18.*
   dockerCmdEnvironment: &dockerCmdEnvironment
     APP_USER: crlupdater
     APP_GROUP: atat
@@ -62,6 +61,13 @@ jobs:
       - run:
           name: "Run Fix Permissions"
           command: docker exec -t --workdir ${APP_DIR} ${CONTAINER_NAME} ./script/fix_permissions ${APP_USER} ${APP_GROUP}
+      - run:
+          name: "Variable Checks"
+          command: |
+            echo "Git SHA: ${GIT_SHA}"
+            echo "Running container name: ${CONTAINER_NAME}"
+            echo "Image name: ${IMAGE_NAME}"
+            docker container list
       - run:
           name: "Commit Container Changes to New Image"
           command: |
