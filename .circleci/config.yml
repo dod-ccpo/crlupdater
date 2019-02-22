@@ -36,33 +36,43 @@ jobs:
           version: 18.05.0-ce
       - run:
           name: "Export GIT_SHA"
+          shell: "/bin/bash -eo pipefail"
           command: echo "export GIT_SHA=$(git rev-parse --short HEAD)" >> $BASH_ENV
       - run:
           name: "Generate the Target Image Name"
+          shell: "/bin/bash -eo pipefail"
           command: echo "export IMAGE_NAME=\"${ATAT_DOCKER_REGISTRY_URL}/${PROD_IMAGE_NAME}:${GIT_SHA}\"" >> $BASH_ENV
       - run:
           name: "Start a Fresh Container"
+          shell: "/bin/bash -eo pipefail"
           command: docker run -d --entrypoint='/bin/sh' -ti --name ${CONTAINER_NAME} alpine:3.8
       - run:
           name: "Create the App Directory"
+          shell: "/bin/bash -eo pipefail"
           command: docker exec -t ${CONTAINER_NAME} mkdir -p ${APP_DIR}
       - run:
           name: "Copy Workspace Contents into the Container"
+          shell: "/bin/bash -eo pipefail"
           command: docker cp . ${CONTAINER_NAME}:${APP_DIR}
       - run:
           name: "Run Alpine Setup"
+          shell: "/bin/bash -eo pipefail"
           command: docker exec -t --workdir ${APP_DIR} ${CONTAINER_NAME} ./script/alpine_setup
       - run:
           name: "Install pipenv"
+          shell: "/bin/bash -eo pipefail"
           command: docker exec -t --workdir ${APP_DIR} ${CONTAINER_NAME} /usr/bin/pip3 install pipenv
       - run:
           name: "Run app setup"
+          shell: "/bin/bash -eo pipefail"
           command: docker exec -t --workdir ${APP_DIR} ${CONTAINER_NAME} ./script/setup
       - run:
           name: "Run Fix Permissions"
+          shell: "/bin/bash -eo pipefail"
           command: docker exec -t --workdir ${APP_DIR} ${CONTAINER_NAME} ./script/fix_permissions ${APP_USER} ${APP_GROUP}
       - run:
           name: "Variable Checks"
+          shell: "/bin/bash -eo pipefail"
           command: |
             echo "Shell: ${0}"
             echo "BASH_ENV: ${BASH_ENV}"
@@ -72,6 +82,7 @@ jobs:
             docker container list
       - run:
           name: "Commit Container Changes to New Image"
+          shell: "/bin/bash -eo pipefail"
           command: |
             docker commit \
               --change="ENV APP_USER \"${APP_USER}\"" \
@@ -89,6 +100,7 @@ jobs:
               ${IMAGE_NAME}
       - run:
           name: "Publish crlupodater Image"
+          shell: "/bin/bash -eo pipefail"
           command: |
             docker image ls
             docker login -u ${REGISTRY_USERNAME} -p ${REGISTRY_PASSWORD} ${ATAT_DOCKER_REGISTRY_URL}
@@ -110,12 +122,15 @@ jobs:
           at: .
       - run:
           name: "Export GIT_SHA"
+          shell: "/bin/bash -eo pipefail"
           command: echo "export GIT_SHA=$(git rev-parse --short HEAD)" >> $BASH_ENV
       - run:
           name: "Generate the Target Image Name"
+          shell: "/bin/bash -eo pipefail"
           command: echo "export IMAGE_NAME=\"${ATAT_DOCKER_REGISTRY_URL}/${PROD_IMAGE_NAME}:${GIT_SHA}\"" >> $BASH_ENV
       - run:
           name: "Update Kubernetes Deployment"
+          shell: "/bin/bash -eo pipefail"
           command: ./deploy/kubernetes/crlupdater-update-deploy.sh
 
 workflows:
