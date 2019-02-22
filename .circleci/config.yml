@@ -73,6 +73,10 @@ jobs:
               --change="ENV APP_USER \"${APP_USER}\"" \
               --change="ENV APP_GROUP \"${APP_GROUP}\"" \
               --change="ENV APP_DIR \"${APP_DIR}\"" \
+              --change="ENV RACKSPACE_AUTH_URL \"${RACKSPACE_AUTH_URL}\"" \
+              --change="ENV RACKSPACE_USERNAME \"${RACKSPACE_USERNAME}\"" \
+              --change="ENV RACKSPACE_PASSWORD \"${RACKSPACE_PASSWORD}\"" \
+              --change="ENV RACKSPACE_STORAGE_URL \"${RACKSPACE_STORAGE_URL}\"" \
               --change='ENTRYPOINT ["/usr/bin/dumb-init", "--"]' \
               --change="CMD [\"bash\", \"-c\", \"${APP_DIR}/script/server\"]" \
               --change="WORKDIR ${APP_DIR}" \
