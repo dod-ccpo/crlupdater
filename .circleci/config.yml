@@ -121,7 +121,7 @@ jobs:
       - run:
           name: "Update Kubernetes Deployment"
           shell: "/bin/bash -eo pipefail"
-          command: ./deploy/kubernetes/crlupdater-update-deploy.sh
+          command: ./deploy/kubernetes/prod/update-deploy.sh
 
 workflows:
   version: 2
