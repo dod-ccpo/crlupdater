@@ -61,7 +61,7 @@ def fetch_current_crls(current_crls_dir, crl_local_file):
             for chunk in response.iter_content(chunk_size=1024):
                 if chunk:
                     crl_archive.write(chunk)
-        
+
     return True
 
 def local_crl_archive_path(current_crls_dir):
@@ -132,8 +132,11 @@ def is_app_subdir(test_dir):
 
 
 class DISAParser(HTMLParser):
-    crl_list = []
     _CRL_MATCH = re.compile("DOD(EMAIL|ID)?CA")
+
+    def reset(self):
+        self.crl_list = []
+        HTMLParser.reset(self)
 
     def handle_starttag(self, tag, attrs):
         if tag == "a":
@@ -259,7 +262,7 @@ if __name__ == "__main__":
         logger.error("Derived temp_dir '{}' is not a subdirectory of this app's workspace".
                 format(temp_dir)+"; Aborting...")
         exit()
-    
+
     while True:
         # Recreate the working directories, if it is safe to do so
         if shutil.rmtree.avoids_symlink_attacks:
